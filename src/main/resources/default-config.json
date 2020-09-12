@@ -1,0 +1,12 @@
+{
+  "sync-remote": "http://himalayandatabase.com/downloads/Himalayan%20Database.zip",
+  "sync-local": "himalayan-database",
+  "sync-interval-millis": 21600000,
+
+  "table-expeditions": "exped",
+  "table-members": "members",
+  "table-peaks": "peaks",
+
+  "table-root-dir": "himalayan-database/HIMDATA",
+  "table-jdbc-url": "jdbc:dbschema:dbf:/%s"
+}
