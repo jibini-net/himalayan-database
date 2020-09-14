@@ -23,8 +23,7 @@ dependencies {
             'javax.servlet:jstl:1.2',
             'org.apache.tomcat.embed:tomcat-embed-jasper',
             'org.json:json:20200518',
-
-            fileTree(dir: 'lib', include: ['*.jar'])
+            'org.apache.tika:tika-parsers:1.21'
 
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }

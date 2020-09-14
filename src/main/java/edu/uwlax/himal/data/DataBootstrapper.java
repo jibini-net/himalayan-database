@@ -1,9 +1,10 @@
 package edu.uwlax.himal.data;
 
 import edu.uwlax.himal.data.impl.DecoratedDatabaseImpl;
+import edu.uwlax.himal.data.impl.DBFDataBootstrapperImpl;
+import edu.uwlax.himal.data.impl.JDBCDataBootstrapperImpl;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.sql.Connection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -44,5 +45,38 @@ public interface DataBootstrapper
     {
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::syncLinkedDatabases,
                 0, intervalMillis, TimeUnit.MILLISECONDS);
+    }
+
+
+    /*=======================================*
+     *                FACTORY                *
+     *=======================================*/
+
+    /**
+     * Creates a sync management object to sync data from a JDBC connection; allows runnable tasks
+     * in order to download requisite files, etc.
+     *
+     * @param connection Existing open JDBC connection from which to load data
+     * @param preTasks Runnable tasks to run before querying the connection
+     *
+     * @return Created instance
+     */
+    static DataBootstrapper createFromConnection(Connection connection, Runnable ... preTasks)
+    {
+        return new JDBCDataBootstrapperImpl(connection, preTasks);
+    }
+
+    /**
+     * Creates a sync management object to sync data from a folder of DBF files; allows runnable
+     * tasks in order to download requisite files, etc.
+     *
+     * @param rootDir Relative path to root directory containing DBF files
+     * @param preTasks Runnable tasks to run before querying the connection
+     *
+     * @return Created instance
+     */
+    static DataBootstrapper createFromDBFDirectory(String rootDir, Runnable ... preTasks)
+    {
+        return new DBFDataBootstrapperImpl(rootDir, preTasks);
     }
 }

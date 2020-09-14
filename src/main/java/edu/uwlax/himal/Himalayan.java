@@ -3,6 +3,7 @@ package edu.uwlax.himal;
 import edu.uwlax.himal.data.DataBootstrapper;
 import edu.uwlax.himal.data.Database;
 import edu.uwlax.himal.data.SwapDatabase;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class Himalayan
     private SwapDatabase members;
     private SwapDatabase peaks;
 
-    private DataBootstrapper bootstrapper = null;
+    private DataBootstrapper bootstrapper;
 
     /**
      * Loads the configuration file from the working directory; copies default values if the file
@@ -42,7 +43,7 @@ public class Himalayan
             // If not exists, load default.  Does not account for updated config schemas.
             if (!configFile.exists())
             {
-                log.debug("Configuration file does not exist; creating default");
+                log.debug("Configuration file does not exist; creating default . . .");
 
                 InputStream defaultStream = Himalayan.class.getClassLoader().getResourceAsStream(
                         "default-config.json");
@@ -60,7 +61,7 @@ public class Himalayan
                 writer.close();
             }
 
-            log.debug("Loading configuration file");
+            log.info("Loading configuration file . . .");
 
             StringBuilder configText = new StringBuilder();
             BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -78,24 +79,32 @@ public class Himalayan
         }
     }
 
+    //TODO MOVE TO OWN CLASS/CREATE ABSTRACT VERSION
+    private void downloadPrerequisites()
+    {
+
+    }
+
     /**
      * Sets up the automated loading of Himalayan Database content
      */
     private void initBootstrapper()
     {
-        log.debug("Initializing automated data updates");
+        log.info("Initializing automated data updates . . .");
 
-        expeditions = Database.createEmptySwap(config.getString("table-expeditions"));
-        members = Database.createEmptySwap(config.getString("table-members"));
-        peaks = Database.createEmptySwap(config.getString("table-peaks"));
+        expeditions = Database.createEmptySwap(getConfig().getString("table-expeditions"));
+        members = Database.createEmptySwap(getConfig().getString("table-members"));
+        peaks = Database.createEmptySwap(getConfig().getString("table-peaks"));
 
-        //TODO INIT BOOTSTRAPPER TO NON-NULL
+        bootstrapper = DataBootstrapper.createFromDBFDirectory(getConfig().getString("table-root-dir"),
+                this::downloadPrerequisites);
+
         bootstrapper.linkDatabase(expeditions, false);
         bootstrapper.linkDatabase(members, false);
         bootstrapper.linkDatabase(peaks, false);
 
-        long millis = config.getLong("sync-interval-millis");
-        log.debug(String.format("Scheduling automated update every %d milliseconds", millis));
+        long millis = getConfig().getLong("sync-interval-millis");
+        log.debug(String.format("Databases set to update every %d milliseconds", millis));
 
         bootstrapper.syncAtInterval(millis);
     }
@@ -107,12 +116,12 @@ public class Himalayan
      */
     public void start()
     {
-        log.info(String.format("Initializing application version %s", Himalayan.VERSION));
+        log.info(String.format("Initializing application version %s . . .", Himalayan.VERSION));
 
         initConfig();
         initBootstrapper();
 
-        log.info("Goodbye!");
+        log.info("Initialization complete!");
     }
 
     /**
@@ -141,14 +150,6 @@ public class Himalayan
 
     public static void main(String[] args)
     {
-        try
-        {
-            Class.forName("com.dbschema.xbase.DbfJdbcDriver");
-        } catch (ClassNotFoundException ex)
-        {
-            throw new RuntimeException("Could not find DBF JDBC driver; please ensure it is on the classpath", ex);
-        }
-
         Himalayan.getInstance().start();
     }
 }
