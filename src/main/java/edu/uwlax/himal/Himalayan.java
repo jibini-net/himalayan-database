@@ -9,24 +9,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Himalayan database initialization and entrypoint
  *
  * @author Zach Goethel
  */
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class Himalayan
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final File configFile = new File("config.json");
 
-    private JSONObject config;
-
-    private SwapDatabase expeditions;
     private SwapDatabase members;
     private SwapDatabase peaks;
+    private SwapDatabase expeditions;
 
     private DataBootstrapper bootstrapper;
+
+    private JSONObject config;
 
     /**
      * Loads the configuration file from the working directory; copies default values if the file
@@ -79,10 +87,101 @@ public class Himalayan
         }
     }
 
+    private void recursiveDelete(File file)
+    {
+        if (file.exists())
+        {
+            if (file.isDirectory())
+            {
+                for (File child : Objects.requireNonNull(file.listFiles()))
+                    recursiveDelete(child);
+            }
+
+            file.delete();
+        }
+    }
+
+    /*
+     * CREDIT:
+     * https://www.codejava.net/java-se/file-io/programmatically-extract-a-zip-file-using-java
+     */
+    private void unzip(String zipFilePath, String destDirectory) throws IOException
+    {
+        File destDir = new File(destDirectory);
+        if (!destDir.exists())
+            destDir.mkdir();
+
+        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
+        ZipEntry entry = zipIn.getNextEntry();
+
+        // Iterates over entries in the zip file
+        while (entry != null)
+        {
+            String filePath = destDirectory + File.separator + entry.getName();
+            if (!entry.isDirectory())
+                // If the entry is a file, extracts it
+                extractFile(zipIn, filePath);
+            else
+            {
+                // if the entry is a directory, make the directory
+                File dir = new File(filePath);
+                dir.mkdirs();
+            }
+
+            zipIn.closeEntry();
+            entry = zipIn.getNextEntry();
+        }
+
+        zipIn.close();
+    }
+
+    /*
+     * CREDIT:
+     * https://www.codejava.net/java-se/file-io/programmatically-extract-a-zip-file-using-java
+     */
+    private void extractFile(ZipInputStream zipIn, String filePath) throws IOException
+    {
+        File f = new File(filePath);
+
+        if (!f.exists())
+        {
+            if (f.getParentFile() != null)
+                f.getParentFile().mkdirs();
+            f.createNewFile();
+        }
+
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+
+        byte[] bytesIn = new byte[4096];
+        int read;
+        while ((read = zipIn.read(bytesIn)) != -1)
+            bos.write(bytesIn, 0, read);
+
+        bos.close();
+    }
+
     //TODO MOVE TO OWN CLASS/CREATE ABSTRACT VERSION
     private void downloadPrerequisites()
     {
+        try
+        {
+            log.info("Downloading latest database packages . . .");
 
+            File packageRoot = new File(getConfig().getString("package-root-dir"));
+            recursiveDelete(packageRoot);
+
+            InputStream in = new URL(getConfig().getString("sync-remote")).openStream();
+            Files.copy(in, Paths.get(getConfig().getString("sync-local")),
+                    StandardCopyOption.REPLACE_EXISTING);
+
+            log.info("Extracting latest database packages . . .");
+            unzip(getConfig().getString("sync-local"), System.getProperty("user.dir"));
+
+            new File(getConfig().getString("sync-local")).delete();
+        } catch (IOException ex)
+        {
+            throw new RuntimeException("Failed to download latest database package", ex);
+        }
     }
 
     /**
@@ -99,9 +198,9 @@ public class Himalayan
         bootstrapper = DataBootstrapper.createFromDBFDirectory(getConfig().getString("table-root-dir"),
                 this::downloadPrerequisites);
 
-        bootstrapper.linkDatabase(expeditions, false);
         bootstrapper.linkDatabase(members, false);
         bootstrapper.linkDatabase(peaks, false);
+        bootstrapper.linkDatabase(expeditions, false);
 
         long millis = getConfig().getLong("sync-interval-millis");
         log.debug(String.format("Databases set to update every %d milliseconds", millis));

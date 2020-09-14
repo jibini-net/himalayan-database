@@ -19,6 +19,7 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 
@@ -49,8 +50,12 @@ public class DBFDataBootstrapperImpl extends AbstractDataBootstrapper
         try
         {
             log.debug(String.format("Parsing DBF for '%s' to XHTML text . . .", database.getTableName()));
-            parser.parse(new FileInputStream(String.format("%s/%s.dbf", rootDir, database.getTableName())),
-                    handler, new Metadata(), new ParseContext());
+
+            InputStream stream = new FileInputStream(String.format("%s/%s.dbf", rootDir,
+                    database.getTableName()));
+            parser.parse(stream, handler, new Metadata(), new ParseContext());
+
+            stream.close();
         } catch (Exception ex)
         {
             log.error("Failed to parse DBF database file(s); sync failure", ex);

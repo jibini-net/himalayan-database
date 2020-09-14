@@ -14,7 +14,8 @@ buildNumber.properties
 .settings/
 
 /config.json
-/himalayan-database/
+/Himalayan Database/
+/*.zip
 
 *.log
 *.temp
