@@ -28,13 +28,11 @@ public class Himalayan
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final File configFile = new File("config.json");
 
+    private JSONObject config;
+
     private SwapDatabase members;
     private SwapDatabase peaks;
     private SwapDatabase expeditions;
-
-    private DataBootstrapper bootstrapper;
-
-    private JSONObject config;
 
     /**
      * Loads the configuration file from the working directory; copies default values if the file
@@ -123,7 +121,7 @@ public class Himalayan
                 extractFile(zipIn, filePath);
             else
             {
-                // if the entry is a directory, make the directory
+                // If the entry is a directory, make the directory
                 File dir = new File(filePath);
                 dir.mkdirs();
             }
@@ -191,12 +189,12 @@ public class Himalayan
     {
         log.info("Initializing automated data updates . . .");
 
-        expeditions = Database.createEmptySwap(getConfig().getString("table-expeditions"));
         members = Database.createEmptySwap(getConfig().getString("table-members"));
         peaks = Database.createEmptySwap(getConfig().getString("table-peaks"));
+        expeditions = Database.createEmptySwap(getConfig().getString("table-expeditions"));
 
-        bootstrapper = DataBootstrapper.createFromDBFDirectory(getConfig().getString("table-root-dir"),
-                this::downloadPrerequisites);
+        DataBootstrapper bootstrapper = DataBootstrapper.createFromDBFDirectory(getConfig()
+                .getString("table-root-dir"), this::downloadPrerequisites);
 
         bootstrapper.linkDatabase(members, false);
         bootstrapper.linkDatabase(peaks, false);
@@ -220,7 +218,7 @@ public class Himalayan
         initConfig();
         initBootstrapper();
 
-        log.info("Initialization complete!");
+        log.info("Initialization complete!\n");
     }
 
     /**

@@ -58,6 +58,6 @@ public abstract class AbstractDataBootstrapper implements DataBootstrapper
             populateDatabase(database);
 
         double seconds = ((double)System.nanoTime() - startTime) / 1000000000;
-        log.info(String.format("Update complete! (%fs)", seconds));
+        log.info(String.format("Update complete! (%fs)\n", seconds));
     }
 }
