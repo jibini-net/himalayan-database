@@ -168,7 +168,21 @@ public class Himalayan
             File packageRoot = new File(getConfig().getString("package-root-dir"));
             recursiveDelete(packageRoot);
 
-            InputStream in = new URL(getConfig().getString("sync-remote")).openStream();
+            InputStream in = null;
+
+            // Himalayan Database site returns error 503 randomly; try multiple times
+            for (int i = 0; i < 5; i ++)
+                try
+                {
+                    in = new URL(getConfig().getString("sync-remote")).openStream();
+                    break;
+                } catch (IOException ex)
+                {
+                    log.error(String.format("Connection attempt %d/5 failed", i + 1), ex);
+                }
+            if (in == null)
+                throw new RuntimeException("Failed to connect to Himalayan Database; no more retries");
+
             Files.copy(in, Paths.get(getConfig().getString("sync-local")),
                     StandardCopyOption.REPLACE_EXISTING);
 
