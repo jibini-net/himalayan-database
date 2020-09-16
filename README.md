@@ -1,0 +1,171 @@
+
+ Himalayan Database
+---
+## Overview
+This library is a collection of tools and web panels for accessing the [Himalayan Database](http://himalayandatabase.com).  It provides a way to connect to the online archive and visualize peak/expedition data.
+
+This project was started by the Eagle Apprenticeship program at UW-La Crosse and is supervised by [Dr. Samantha Foley](https://www.uwlax.edu/profile/sfoley/) and written by Heather Miller and Zach Goethel.
+
+## Data Acquisition
+Data from the [main project site](http://himalayandatabase.com) is distributed as a ZIP of Microsoft Visual FoxPro 9 tables and an executable used to browse them.  This project contains a system for reformatting these files to be more accessible.
+
+### Scheduled Sync
+Database packages are downloaded at a regular (configurable) interval.  Data from the Himalayan expedition, member, and peak libraries is parsed from antiquated DBF files to JSON.  When a new version of the data is downloaded, the application engine creates a collection of `JSONObjects`.
+
+As demonstrated in the diagram below, the web panels access the latest data through a [decorated database instance](https://github.com/zgoethel/himalayan-database/blob/master/src/main/java/edu/uwlax/himal/data/SwapDatabase.java) (called a `SwapDatabase`) whose backing data can be updated ([swapped](https://en.wikipedia.org/wiki/Swap_chain)) without interrupting user functionality:
+
+[![](https://mermaid.ink/img/eyJjb2RlIjoiZ3JhcGggTFJcbkFbT25saW5lIGFyY2hpdmVdIC0tIE9sZCBkb3dubG9hZCAtLT4gQihPdXRkYXRlZCBkYXRhYmFzZSlcbkIgLS0-IEdbT3JwaGFuZWQvZ2FyYmFnZSBjb2xsZWN0ZWRdXG5BW09ubGluZSBhcmNoaXZlXSAtLSBPbGQgZG93bmxvYWQgLS0-IEMoT3V0ZGF0ZWQgZGF0YWJhc2UpXG5BW09ubGluZSBhcmNoaXZlXSAtLSBPbGQgZG93bmxvYWQgLS0-IEQoT3V0ZGF0ZWQgZGF0YWJhc2UpXG5BW09ubGluZSBhcmNoaXZlXSA9PSBOZXcgZG93bmxvYWQgPT0-IEUoTGF0ZXN0IGRhdGFiYXNlKVxuQyAtLT4gR1xuRCAtLT4gR1xuRSA9PSBDdXJyZW50IGxpbmsgPT0-IEZbU3dhcERhdGFiYXNlXSBcbkYgPT0-IEgoKFdlYkFwcCkpIiwibWVybWFpZCI6eyJ0aGVtZSI6ImRlZmF1bHQiLCJ0aGVtZVZhcmlhYmxlcyI6eyJiYWNrZ3JvdW5kIjoid2hpdGUiLCJwcmltYXJ5Q29sb3IiOiIjRUNFQ0ZGIiwic2Vjb25kYXJ5Q29sb3IiOiIjZmZmZmRlIiwidGVydGlhcnlDb2xvciI6ImhzbCg4MCwgMTAwJSwgOTYuMjc0NTA5ODAzOSUpIiwicHJpbWFyeUJvcmRlckNvbG9yIjoiaHNsKDI0MCwgNjAlLCA4Ni4yNzQ1MDk4MDM5JSkiLCJzZWNvbmRhcnlCb3JkZXJDb2xvciI6ImhzbCg2MCwgNjAlLCA4My41Mjk0MTE3NjQ3JSkiLCJ0ZXJ0aWFyeUJvcmRlckNvbG9yIjoiaHNsKDgwLCA2MCUsIDg2LjI3NDUwOTgwMzklKSIsInByaW1hcnlUZXh0Q29sb3IiOiIjMTMxMzAwIiwic2Vjb25kYXJ5VGV4dENvbG9yIjoiIzAwMDAyMSIsInRlcnRpYXJ5VGV4dENvbG9yIjoicmdiKDkuNTAwMDAwMDAwMSwgOS41MDAwMDAwMDAxLCA5LjUwMDAwMDAwMDEpIiwibGluZUNvbG9yIjoiIzMzMzMzMyIsInRleHRDb2xvciI6IiMzMzMiLCJtYWluQmtnIjoiI0VDRUNGRiIsInNlY29uZEJrZyI6IiNmZmZmZGUiLCJib3JkZXIxIjoiIzkzNzBEQiIsImJvcmRlcjIiOiIjYWFhYTMzIiwiYXJyb3doZWFkQ29sb3IiOiIjMzMzMzMzIiwiZm9udEZhbWlseSI6IlwidHJlYnVjaGV0IG1zXCIsIHZlcmRhbmEsIGFyaWFsIiwiZm9udFNpemUiOiIxNnB4IiwibGFiZWxCYWNrZ3JvdW5kIjoiI2U4ZThlOCIsIm5vZGVCa2ciOiIjRUNFQ0ZGIiwibm9kZUJvcmRlciI6IiM5MzcwREIiLCJjbHVzdGVyQmtnIjoiI2ZmZmZkZSIsImNsdXN0ZXJCb3JkZXIiOiIjYWFhYTMzIiwiZGVmYXVsdExpbmtDb2xvciI6IiMzMzMzMzMiLCJ0aXRsZUNvbG9yIjoiIzMzMyIsImVkZ2VMYWJlbEJhY2tncm91bmQiOiIjZThlOGU4IiwiYWN0b3JCb3JkZXIiOiJoc2woMjU5LjYyNjE2ODIyNDMsIDU5Ljc3NjUzNjMxMjglLCA4Ny45MDE5NjA3ODQzJSkiLCJhY3RvckJrZyI6IiNFQ0VDRkYiLCJhY3RvclRleHRDb2xvciI6ImJsYWNrIiwiYWN0b3JMaW5lQ29sb3IiOiJncmV5Iiwic2lnbmFsQ29sb3IiOiIjMzMzIiwic2lnbmFsVGV4dENvbG9yIjoiIzMzMyIsImxhYmVsQm94QmtnQ29sb3IiOiIjRUNFQ0ZGIiwibGFiZWxCb3hCb3JkZXJDb2xvciI6ImhzbCgyNTkuNjI2MTY4MjI0MywgNTkuNzc2NTM2MzEyOCUsIDg3LjkwMTk2MDc4NDMlKSIsImxhYmVsVGV4dENvbG9yIjoiYmxhY2siLCJsb29wVGV4dENvbG9yIjoiYmxhY2siLCJub3RlQm9yZGVyQ29sb3IiOiIjYWFhYTMzIiwibm90ZUJrZ0NvbG9yIjoiI2ZmZjVhZCIsIm5vdGVUZXh0Q29sb3IiOiJibGFjayIsImFjdGl2YXRpb25Cb3JkZXJDb2xvciI6IiM2NjYiLCJhY3RpdmF0aW9uQmtnQ29sb3IiOiIjZjRmNGY0Iiwic2VxdWVuY2VOdW1iZXJDb2xvciI6IndoaXRlIiwic2VjdGlvbkJrZ0NvbG9yIjoicmdiYSgxMDIsIDEwMiwgMjU1LCAwLjQ5KSIsImFsdFNlY3Rpb25Ca2dDb2xvciI6IndoaXRlIiwic2VjdGlvbkJrZ0NvbG9yMiI6IiNmZmY0MDAiLCJ0YXNrQm9yZGVyQ29sb3IiOiIjNTM0ZmJjIiwidGFza0JrZ0NvbG9yIjoiIzhhOTBkZCIsInRhc2tUZXh0TGlnaHRDb2xvciI6IndoaXRlIiwidGFza1RleHRDb2xvciI6IndoaXRlIiwidGFza1RleHREYXJrQ29sb3IiOiJibGFjayIsInRhc2tUZXh0T3V0c2lkZUNvbG9yIjoiYmxhY2siLCJ0YXNrVGV4dENsaWNrYWJsZUNvbG9yIjoiIzAwMzE2MyIsImFjdGl2ZVRhc2tCb3JkZXJDb2xvciI6IiM1MzRmYmMiLCJhY3RpdmVUYXNrQmtnQ29sb3IiOiIjYmZjN2ZmIiwiZ3JpZENvbG9yIjoibGlnaHRncmV5IiwiZG9uZVRhc2tCa2dDb2xvciI6ImxpZ2h0Z3JleSIsImRvbmVUYXNrQm9yZGVyQ29sb3IiOiJncmV5IiwiY3JpdEJvcmRlckNvbG9yIjoiI2ZmODg4OCIsImNyaXRCa2dDb2xvciI6InJlZCIsInRvZGF5TGluZUNvbG9yIjoicmVkIiwibGFiZWxDb2xvciI6ImJsYWNrIiwiZXJyb3JCa2dDb2xvciI6IiM1NTIyMjIiLCJlcnJvclRleHRDb2xvciI6IiM1NTIyMjIiLCJjbGFzc1RleHQiOiIjMTMxMzAwIiwiZmlsbFR5cGUwIjoiI0VDRUNGRiIsImZpbGxUeXBlMSI6IiNmZmZmZGUiLCJmaWxsVHlwZTIiOiJoc2woMzA0LCAxMDAlLCA5Ni4yNzQ1MDk4MDM5JSkiLCJmaWxsVHlwZTMiOiJoc2woMTI0LCAxMDAlLCA5My41Mjk0MTE3NjQ3JSkiLCJmaWxsVHlwZTQiOiJoc2woMTc2LCAxMDAlLCA5Ni4yNzQ1MDk4MDM5JSkiLCJmaWxsVHlwZTUiOiJoc2woLTQsIDEwMCUsIDkzLjUyOTQxMTc2NDclKSIsImZpbGxUeXBlNiI6ImhzbCg4LCAxMDAlLCA5Ni4yNzQ1MDk4MDM5JSkiLCJmaWxsVHlwZTciOiJoc2woMTg4LCAxMDAlLCA5My41Mjk0MTE3NjQ3JSkifX0sInVwZGF0ZUVkaXRvciI6ZmFsc2V9)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoiZ3JhcGggTFJcbkFbT25saW5lIGFyY2hpdmVdIC0tIE9sZCBkb3dubG9hZCAtLT4gQihPdXRkYXRlZCBkYXRhYmFzZSlcbkIgLS0-IEdbT3JwaGFuZWQvZ2FyYmFnZSBjb2xsZWN0ZWRdXG5BW09ubGluZSBhcmNoaXZlXSAtLSBPbGQgZG93bmxvYWQgLS0-IEMoT3V0ZGF0ZWQgZGF0YWJhc2UpXG5BW09ubGluZSBhcmNoaXZlXSAtLSBPbGQgZG93bmxvYWQgLS0-IEQoT3V0ZGF0ZWQgZGF0YWJhc2UpXG5BW09ubGluZSBhcmNoaXZlXSA9PSBOZXcgZG93bmxvYWQgPT0-IEUoTGF0ZXN0IGRhdGFiYXNlKVxuQyAtLT4gR1xuRCAtLT4gR1xuRSA9PSBDdXJyZW50IGxpbmsgPT0-IEZbU3dhcERhdGFiYXNlXSBcbkYgPT0-IEgoKFdlYkFwcCkpIiwibWVybWFpZCI6eyJ0aGVtZSI6ImRlZmF1bHQiLCJ0aGVtZVZhcmlhYmxlcyI6eyJiYWNrZ3JvdW5kIjoid2hpdGUiLCJwcmltYXJ5Q29sb3IiOiIjRUNFQ0ZGIiwic2Vjb25kYXJ5Q29sb3IiOiIjZmZmZmRlIiwidGVydGlhcnlDb2xvciI6ImhzbCg4MCwgMTAwJSwgOTYuMjc0NTA5ODAzOSUpIiwicHJpbWFyeUJvcmRlckNvbG9yIjoiaHNsKDI0MCwgNjAlLCA4Ni4yNzQ1MDk4MDM5JSkiLCJzZWNvbmRhcnlCb3JkZXJDb2xvciI6ImhzbCg2MCwgNjAlLCA4My41Mjk0MTE3NjQ3JSkiLCJ0ZXJ0aWFyeUJvcmRlckNvbG9yIjoiaHNsKDgwLCA2MCUsIDg2LjI3NDUwOTgwMzklKSIsInByaW1hcnlUZXh0Q29sb3IiOiIjMTMxMzAwIiwic2Vjb25kYXJ5VGV4dENvbG9yIjoiIzAwMDAyMSIsInRlcnRpYXJ5VGV4dENvbG9yIjoicmdiKDkuNTAwMDAwMDAwMSwgOS41MDAwMDAwMDAxLCA5LjUwMDAwMDAwMDEpIiwibGluZUNvbG9yIjoiIzMzMzMzMyIsInRleHRDb2xvciI6IiMzMzMiLCJtYWluQmtnIjoiI0VDRUNGRiIsInNlY29uZEJrZyI6IiNmZmZmZGUiLCJib3JkZXIxIjoiIzkzNzBEQiIsImJvcmRlcjIiOiIjYWFhYTMzIiwiYXJyb3doZWFkQ29sb3IiOiIjMzMzMzMzIiwiZm9udEZhbWlseSI6IlwidHJlYnVjaGV0IG1zXCIsIHZlcmRhbmEsIGFyaWFsIiwiZm9udFNpemUiOiIxNnB4IiwibGFiZWxCYWNrZ3JvdW5kIjoiI2U4ZThlOCIsIm5vZGVCa2ciOiIjRUNFQ0ZGIiwibm9kZUJvcmRlciI6IiM5MzcwREIiLCJjbHVzdGVyQmtnIjoiI2ZmZmZkZSIsImNsdXN0ZXJCb3JkZXIiOiIjYWFhYTMzIiwiZGVmYXVsdExpbmtDb2xvciI6IiMzMzMzMzMiLCJ0aXRsZUNvbG9yIjoiIzMzMyIsImVkZ2VMYWJlbEJhY2tncm91bmQiOiIjZThlOGU4IiwiYWN0b3JCb3JkZXIiOiJoc2woMjU5LjYyNjE2ODIyNDMsIDU5Ljc3NjUzNjMxMjglLCA4Ny45MDE5NjA3ODQzJSkiLCJhY3RvckJrZyI6IiNFQ0VDRkYiLCJhY3RvclRleHRDb2xvciI6ImJsYWNrIiwiYWN0b3JMaW5lQ29sb3IiOiJncmV5Iiwic2lnbmFsQ29sb3IiOiIjMzMzIiwic2lnbmFsVGV4dENvbG9yIjoiIzMzMyIsImxhYmVsQm94QmtnQ29sb3IiOiIjRUNFQ0ZGIiwibGFiZWxCb3hCb3JkZXJDb2xvciI6ImhzbCgyNTkuNjI2MTY4MjI0MywgNTkuNzc2NTM2MzEyOCUsIDg3LjkwMTk2MDc4NDMlKSIsImxhYmVsVGV4dENvbG9yIjoiYmxhY2siLCJsb29wVGV4dENvbG9yIjoiYmxhY2siLCJub3RlQm9yZGVyQ29sb3IiOiIjYWFhYTMzIiwibm90ZUJrZ0NvbG9yIjoiI2ZmZjVhZCIsIm5vdGVUZXh0Q29sb3IiOiJibGFjayIsImFjdGl2YXRpb25Cb3JkZXJDb2xvciI6IiM2NjYiLCJhY3RpdmF0aW9uQmtnQ29sb3IiOiIjZjRmNGY0Iiwic2VxdWVuY2VOdW1iZXJDb2xvciI6IndoaXRlIiwic2VjdGlvbkJrZ0NvbG9yIjoicmdiYSgxMDIsIDEwMiwgMjU1LCAwLjQ5KSIsImFsdFNlY3Rpb25Ca2dDb2xvciI6IndoaXRlIiwic2VjdGlvbkJrZ0NvbG9yMiI6IiNmZmY0MDAiLCJ0YXNrQm9yZGVyQ29sb3IiOiIjNTM0ZmJjIiwidGFza0JrZ0NvbG9yIjoiIzhhOTBkZCIsInRhc2tUZXh0TGlnaHRDb2xvciI6IndoaXRlIiwidGFza1RleHRDb2xvciI6IndoaXRlIiwidGFza1RleHREYXJrQ29sb3IiOiJibGFjayIsInRhc2tUZXh0T3V0c2lkZUNvbG9yIjoiYmxhY2siLCJ0YXNrVGV4dENsaWNrYWJsZUNvbG9yIjoiIzAwMzE2MyIsImFjdGl2ZVRhc2tCb3JkZXJDb2xvciI6IiM1MzRmYmMiLCJhY3RpdmVUYXNrQmtnQ29sb3IiOiIjYmZjN2ZmIiwiZ3JpZENvbG9yIjoibGlnaHRncmV5IiwiZG9uZVRhc2tCa2dDb2xvciI6ImxpZ2h0Z3JleSIsImRvbmVUYXNrQm9yZGVyQ29sb3IiOiJncmV5IiwiY3JpdEJvcmRlckNvbG9yIjoiI2ZmODg4OCIsImNyaXRCa2dDb2xvciI6InJlZCIsInRvZGF5TGluZUNvbG9yIjoicmVkIiwibGFiZWxDb2xvciI6ImJsYWNrIiwiZXJyb3JCa2dDb2xvciI6IiM1NTIyMjIiLCJlcnJvclRleHRDb2xvciI6IiM1NTIyMjIiLCJjbGFzc1RleHQiOiIjMTMxMzAwIiwiZmlsbFR5cGUwIjoiI0VDRUNGRiIsImZpbGxUeXBlMSI6IiNmZmZmZGUiLCJmaWxsVHlwZTIiOiJoc2woMzA0LCAxMDAlLCA5Ni4yNzQ1MDk4MDM5JSkiLCJmaWxsVHlwZTMiOiJoc2woMTI0LCAxMDAlLCA5My41Mjk0MTE3NjQ3JSkiLCJmaWxsVHlwZTQiOiJoc2woMTc2LCAxMDAlLCA5Ni4yNzQ1MDk4MDM5JSkiLCJmaWxsVHlwZTUiOiJoc2woLTQsIDEwMCUsIDkzLjUyOTQxMTc2NDclKSIsImZpbGxUeXBlNiI6ImhzbCg4LCAxMDAlLCA5Ni4yNzQ1MDk4MDM5JSkiLCJmaWxsVHlwZTciOiJoc2woMTg4LCAxMDAlLCA5My41Mjk0MTE3NjQ3JSkifX0sInVwZGF0ZUVkaXRvciI6ZmFsc2V9)
+
+### Data Columns
+#### Expeditions (`exped.dbf`)
+|Column Name|Data Type|Description|
+|-|-|-|
+|BCDATE|Date|Undocumented|
+|O2CLIMB|Boolean|Undocumented|
+|STDRTE|Unknown|Undocumented|
+|PRIMREF|Unknown|Linked reference ID?|
+|CAMPSITES|String|Comma-delimited list of campsite data |
+|DISPUTED|Boolean|Whether the expedition is disputed|
+|HOST|Integer|Undocumented|
+|TOTDAYS|Integer|Total days of the expedition|
+|PARAPENTE|Boolean|Undocumented|
+|CHKSUM|Integer|Undocumented|
+|COMRTE|Unknown|Undocumented|
+|NATION|String|Nation listed with this expedition|
+|CLAIMED|Boolean|Undocumented|
+|YEAR|Integer|Year in which the expedition took place|
+|TRAVERSE|Boolean|Undocumented|
+|LEADERS|String|Name(s) of the leader(s) on this expedition|
+|SMTDATE|Date|Undocumented|
+|TERMDATE|Date|Termination date?|
+|NOHIRED|Boolean|Undocumented|
+|COUNTRIES|String|Countries related to this expedition|
+|ACCIDENTS|Unknown|Undocumented|
+|SUCCESS3|Boolean|Undocumented|
+|SUCCESS4|Boolean|Undocumented|
+|EXPID|String|Primary expedition ID|
+|SUCCESS1|Boolean|Undocumented|
+|HIGHPOINT|Integer|Highest elevation reached during this expedition|
+|SUCCESS2|Boolean|Undocumented|
+|MDEATHS|Integer|Number of member deaths|
+|02MEDICAL|Boolean|Undocumented|
+|CAMPS|Integer|Number of camps on this expedition|
+|ROUTEMEMO|String|Undocumented|
+|ROUTE3|String|Undocumented|
+|ROUTE4|String|Undocumented|
+|ROUTE1|String|Undocumented|
+|ROUTE2|String|Undocumented|
+|O2DESCENT|Boolean|Undocumented|
+|O2SLEEP|Boolean|Undocumented|
+|PRIMMEM|Boolean|Undocumented|
+|O2NONE|Boolean|Undocumented|
+|PEAKID|String|Linked peak ID|
+|ROPE|Integer|Undocumented|
+|TOTMEMBERS|Integer|Total number of members on this expedition|
+|PRIMRTE|Boolean|Undocumented|
+|SMTTIME|Integer|Undocumented|
+|SMTDAYS|Integer|Undocumented|
+|O2TAKEN|Boolean|Undocumented|
+|ACHIEVMENT|Unknown|Undocumented|
+|SPONSOR|String|Sponsor of the expedition?|
+|SMTMEMBERS|Integer|Undocumented|
+|TERMNOTE|String|Undocumented|
+|APPROACH|String|Undocumented|
+|OTHERSMTS|String|Undocumented|
+|SMTHIRED|Integer|Undocumented|
+|TOTHIRED|Integer|Total members hired?|
+|PRIMID|Unknown|Undocumented|
+|SEASON|Integer|Season code (unknown attribute values)|
+|ASCENT1|String|Undocumented|
+|SKI|Boolean|Whether or not this expedition had skis?|
+|AGENCY|String|Agency associated with this expedition|
+|HDEATHS|Integer|Undocumented|
+|TERMREASON|Integer|Undocumented|
+|O2UNKWN|Boolean|Undocumented|
+|ASCENT4|Unknown|Undocumented|
+|ASCENT3|Unknown|Undocumented|
+|ASCENT2|Unknown|Undocumented|
+
+#### Members (`members.dbf`)
+|Column Name|Data Type|Description|
+|-|-|-|
+|DEATHNOTE|String|Message related to death information|
+|LNAME|String|Member last name|
+|MASCENT1|Integer|Undocumented|
+|INJURY|Boolean|Whether the member was injured|
+|MASCENT2|Integer|Undocumented|
+|SHERPA|Boolean|Whether the member is a Sherpa|
+|DEATH|Boolean|Whether the member was killed|
+|INJURYTIME|Unknown|Undocumented|
+|MO2DESCENT|Boolean|Undocumented|
+|MASCENT3|Integer|Undocumented|
+|CALCAGE|Integer|Age of the member?|
+|SUPPORT|Boolean|Undocumented|
+|STATUS|String|Role name of the member|
+|LEADER|Boolean|Whether the member was an expedition leader|
+|MSMTDATE3|Unknown|Undocumented|
+|NOTTOBC|Boolean|Undocumented|
+|BCONLY|Boolean|Undocumented|
+|MROUTE2|Integer|Undocumented|
+|MROUTE3|Integer|Undocumented|
+|MROUTE1|Integer|Undocumented|
+|MSMTDATE1|Unknown|Undocumented|
+|MSMTDATE2|Unknown|Undocumented|
+|MSKI|Boolean|Undocumented|
+|AMS|Boolean|Undocumented|
+|M02CLIMB|Boolean|Undocumented|
+|M02SLEEP|Boolean|Undocumented|
+|MCLAIMED|Boolean|Undocumented|
+|EXPID|String|Linked expedition ID|
+|FNAME|String|Member first name|
+|M02MEDICAL|Boolean|Undocumented|
+|DEPUTY|Boolean|Undocumented|
+|DISABLED|Boolean|Whether the member is recorded as disabled|
+|MO2NOTE|Unknown|Undocumented|
+|MSMTTERM|Integer|Undocumented|
+|HCN|Integer|Undocumented|
+|MSMTTIME3|Unknown|Undocumented|
+|MSMTBID|Integer|Undocumented|
+|MSMTTIME2|Unknown|Undocumented|
+|MSMTTIME1|Unknown|Undocumented|
+|MSEASON|Integer|Undocumented|
+|MTRAVERSE|Boolean|Undocumented|
+|DEATHDATE|Date|Recorded date of death|
+|DEATHTYPE|Integer|Undocumented|
+|SEX|String|Recorded sex of the member (M/F)|
+|HIRED|Boolean|Whether the member was hired for the expedition|
+|MPARAPENTE|Boolean|Undocumented|
+|MSMTNOTE3|String|Undocumented|
+|BIRTHDATE|Date|Birth date of the member|
+|MSMTNOTE1|String|Undocumented|
+|MSUCCESS|Boolean|Undocumented|
+|MSMTNOTE2|String|Undocumented|
+|MSOLO|Boolean|Whether the member was on a solo expedition|
+|DEATHHGTM|Integer|Undocumented|
+|MDISPUTED|Boolean|Undocumented|
+|MEMBERMEMO|String|Undocumented|
+|PEAKID|String|Linked peak ID|
+|RESIDENCE|String|Member place of residence|
+|TIBETAN|Boolean|Whether the member is Tibetan|
+|DEATHCLASS|Integer|Undocumented|
+|MPERHIGHPT|Integer|Undocumented|
+|MCHKSUM|Integer|Undocumented|
+|MEMBID|String|Primary member ID|
+|CITIZEN|String|Country of citizenship of this member|
+|AGE|Integer|Age of the member|
+|INJURYDATE|Date|Date on which the member was injured|
+|WEATHER|Boolean|Undocumented|
+|DEATHRTE|Unknown|Undocumented|
+|MSPEED|Unknown|Undocumented|
+|INJURYHGTM|Unknown|Undocumented|
+|NECROLOGY|Unknown|Undocumented|
+|DEATHTIME|Time|Time of death|
+|MYEAR|Integer|Undocumented|
+|YOB|Integer|Year of birth?|
+|MHIGHPT|Boolean|Undocumented|
+|OCCUPATION|String|Occupation of member|
+|MO2USED|Boolean|Undocumented|
+|MO2NONE|Boolean|Undocumented|
+|INJURYTYPE|Integer|Injury type code (unknown attribute values)|
+
+Peaks/references not yet listed
