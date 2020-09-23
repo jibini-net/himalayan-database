@@ -2,25 +2,32 @@ package edu.uwlax.himal.data.impl;
 
 import edu.uwlax.himal.data.Database;
 import edu.uwlax.himal.data.SwapDatabase;
+
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.dbf.DBFParser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.ToXMLContentHandler;
+
 import org.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
+
 import java.util.ArrayList;
 
 /**
@@ -51,8 +58,7 @@ public class DBFDataBootstrapperImpl extends AbstractDataBootstrapper
         {
             log.debug(String.format("Parsing DBF for '%s' to XHTML text . . .", database.getTableName()));
 
-            InputStream stream = new FileInputStream(String.format("%s/%s.dbf", rootDir,
-                    database.getTableName()));
+            InputStream stream = new FileInputStream(String.format("%s/%s.dbf", rootDir, database.getTableName()));
             parser.parse(stream, handler, new Metadata(), new ParseContext());
 
             stream.close();

@@ -5,6 +5,7 @@ import edu.uwlax.himal.data.impl.DBFDataBootstrapperImpl;
 import edu.uwlax.himal.data.impl.JDBCDataBootstrapperImpl;
 
 import java.sql.Connection;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -43,8 +44,8 @@ public interface DataBootstrapper
      */
     default void syncAtInterval(long intervalMillis)
     {
-        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::syncLinkedDatabases,
-                0, intervalMillis, TimeUnit.MILLISECONDS);
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this::syncLinkedDatabases, 0,
+                intervalMillis, TimeUnit.MILLISECONDS);
     }
 
 

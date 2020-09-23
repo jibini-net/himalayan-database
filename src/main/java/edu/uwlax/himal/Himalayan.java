@@ -5,14 +5,18 @@ import edu.uwlax.himal.data.Database;
 import edu.uwlax.himal.data.SwapDatabase;
 
 import org.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+
 import java.net.URL;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -70,8 +74,7 @@ public class Himalayan
             log.info("Loading configuration file . . .");
 
             StringBuilder configText = new StringBuilder();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(configFile)));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile)));
 
             String line;
             while ((line = reader.readLine()) != null)

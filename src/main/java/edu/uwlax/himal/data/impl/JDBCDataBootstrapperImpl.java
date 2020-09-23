@@ -2,13 +2,16 @@ package edu.uwlax.himal.data.impl;
 
 import edu.uwlax.himal.data.Database;
 import edu.uwlax.himal.data.SwapDatabase;
+
 import org.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import java.util.ArrayList;
 
 /**
@@ -37,8 +40,8 @@ public class JDBCDataBootstrapperImpl extends AbstractDataBootstrapper
             log.debug(String.format("Querying table '%s' for database updates . . .",
                     database.getTableName()));
 
-            ResultSet results = connection.createStatement() .executeQuery(String.format(
-                    "select * from %s", database.getTableName()));
+            ResultSet results = connection.createStatement() .executeQuery(String.format("select * from %s",
+                    database.getTableName()));
             ArrayList<JSONObject> rows = new ArrayList<>();
 
             log.debug("Query complete; processing . . .");
@@ -57,8 +60,7 @@ public class JDBCDataBootstrapperImpl extends AbstractDataBootstrapper
             database.swap(Database.createImmutable(database.getTableName(), rows));
         } catch (SQLException ex)
         {
-            log.error(String.format("Failed to query table '%s' for database updates",
-                    database.getTableName()), ex);
+            log.error(String.format("Failed to query table '%s' for database updates", database.getTableName()), ex);
         }
     }
 }
