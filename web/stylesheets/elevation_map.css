@@ -1,0 +1,67 @@
+body {
+    background-color: #212120;
+    color: #FFFFFF;
+}
+
+#mapContent {
+    height: 100%;
+    width: 100%;
+}
+
+#mapid {
+    height: 93%;
+    width: 100%;
+}
+
+/* Begin Control Bar styles */
+
+#controlBar {
+    display: flex;
+    height: 50px;
+    justify-content: space-between;
+}
+
+.mapTitle {
+    font-size: 55px;
+    font-family: 'Microsoft Himalaya';
+}
+
+.options {
+    display: flex;
+    font-family: 'Microsoft Himalaya';
+    font-size: 23px;
+}
+
+.optionGroup {
+    display: flex;
+    padding-right: 15px;
+}
+
+.optionColumn {
+    display: flex;
+    flex-direction: column;
+}
+
+.optionColumn input {
+    justify-content: space-evenly;
+}
+
+.optionText {
+    padding-right: 6px;
+    align-self: flex-end;
+}
+
+.inputBox {
+    width: 45px;
+}
+
+.blnControl {
+    margin-bottom: 7px;
+}
+
+#btnFilter {
+    height: 30px;
+    margin-top: 6px;
+}
+
+/* End Control Bar styles */
