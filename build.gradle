@@ -14,9 +14,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web',
-            'org.springframework.boot:spring-boot-starter-actuator',
             'org.springframework.boot:spring-boot-starter-tomcat',
-            'org.springframework.boot:spring-boot-starter-websocket',
 
             'org.springframework.security:spring-security-messaging',
 

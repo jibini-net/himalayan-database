@@ -8,6 +8,8 @@ import org.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.*;
 
@@ -27,6 +29,7 @@ import java.util.zip.ZipInputStream;
  * @author Zach Goethel
  */
 @SuppressWarnings("ResultOfMethodCallIgnored")
+@SpringBootApplication
 public class Himalayan
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -265,5 +268,7 @@ public class Himalayan
     public static void main(String[] args)
     {
         Himalayan.getInstance().start();
+
+        SpringApplication.run(Himalayan.class, args);
     }
 }
