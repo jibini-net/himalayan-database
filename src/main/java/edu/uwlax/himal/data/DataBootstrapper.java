@@ -1,5 +1,6 @@
 package edu.uwlax.himal.data;
 
+import edu.uwlax.himal.data.impl.CSVDataBootstrapper;
 import edu.uwlax.himal.data.impl.DecoratedDatabaseImpl;
 import edu.uwlax.himal.data.impl.DBFDataBootstrapperImpl;
 import edu.uwlax.himal.data.impl.JDBCDataBootstrapperImpl;
@@ -79,5 +80,19 @@ public interface DataBootstrapper
     static DataBootstrapper createFromDBFDirectory(String rootDir, Runnable ... preTasks)
     {
         return new DBFDataBootstrapperImpl(rootDir, preTasks);
+    }
+
+    /**
+     * Creates a sync management object to sync data from a folder of CSV files; allows runnable
+     * tasks in order to download requisite files, etc.
+     *
+     * @param rootDir Relative path to root directory containing CSV files
+     * @param preTasks Runnable tasks to run before querying the connection
+     *
+     * @return Created instance
+     */
+    static DataBootstrapper createFromCSVDirectory(String rootDir, Runnable ... preTasks)
+    {
+        return new CSVDataBootstrapper(rootDir, preTasks);
     }
 }

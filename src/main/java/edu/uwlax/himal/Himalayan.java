@@ -8,8 +8,11 @@ import org.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 
@@ -30,16 +33,19 @@ import java.util.zip.ZipInputStream;
  */
 @SuppressWarnings("ResultOfMethodCallIgnored")
 @SpringBootApplication
-public class Himalayan
+@Component
+public class Himalayan implements CommandLineRunner
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final File configFile = new File("config.json");
 
     private JSONObject config;
 
-    private SwapDatabase members;
-    private SwapDatabase peaks;
-    private SwapDatabase expeditions;
+    public SwapDatabase members;
+    public SwapDatabase peaks;
+    public SwapDatabase expeditions;
+
+    public SwapDatabase auxPeaks;
 
     /**
      * Loads the configuration file from the working directory; copies default values if the file
@@ -209,6 +215,7 @@ public class Himalayan
     {
         log.info("Initializing automated data updates . . .");
 
+        // PRIMARY DATABASES
         members = Database.createEmptySwap(getConfig().getString("table-members"));
         peaks = Database.createEmptySwap(getConfig().getString("table-peaks"));
         expeditions = Database.createEmptySwap(getConfig().getString("table-expeditions"));
@@ -220,10 +227,19 @@ public class Himalayan
         bootstrapper.linkDatabase(peaks, false);
         bootstrapper.linkDatabase(expeditions, false);
 
+        // AUXILIARY DATA SOURCES
+        auxPeaks = Database.createEmptySwap("peak-coords");
+
+        DataBootstrapper auxBootstrapper = DataBootstrapper.createFromCSVDirectory("aux-data");
+
+        auxBootstrapper.linkDatabase(auxPeaks, false);
+
+        // GENERAL OPERATIONS
         long millis = getConfig().getLong("sync-interval-millis");
         log.debug(String.format("Databases set to update every %d milliseconds", millis));
 
         bootstrapper.syncAtInterval(millis);
+        auxBootstrapper.syncAtInterval(millis);
     }
 
     /**
@@ -231,7 +247,8 @@ public class Himalayan
      *
      * @throws RuntimeException If any initialization step catches or detects an error
      */
-    public void start()
+    @Override
+    public void run(String ... args)
     {
         log.info(String.format("Initializing application version %s . . .", Himalayan.VERSION));
 
@@ -252,22 +269,22 @@ public class Himalayan
 
     public static final String VERSION = "1.0-SNAPSHOT";
 
-    private static Himalayan instance = null;
-
-    /**
-     * @return Singleton {@link Himalayan} instance
-     */
-    public static Himalayan getInstance()
-    {
-        if (instance == null)
-            instance = new Himalayan();
-
-        return instance;
-    }
+//    private static Himalayan instance = null;
+//
+//    /**
+//     * @return Singleton {@link Himalayan} instance
+//     */
+//    public static Himalayan getInstance()
+//    {
+//        if (instance == null)
+//            instance = new Himalayan();
+//
+//        return instance;
+//    }
 
     public static void main(String[] args)
     {
-        Himalayan.getInstance().start();
+//        Himalayan.getInstance().start();
 
         SpringApplication.run(Himalayan.class, args);
     }
