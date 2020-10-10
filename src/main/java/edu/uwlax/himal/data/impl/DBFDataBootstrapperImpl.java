@@ -8,27 +8,18 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.dbf.DBFParser;
 import org.apache.tika.sax.BodyContentHandler;
-import org.apache.tika.sax.ToXMLContentHandler;
 
 import org.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.StringReader;
+import java.io.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of the data bootstrapper which loads data via Apache Tika's DBF parser
@@ -51,15 +42,34 @@ public class DBFDataBootstrapperImpl extends AbstractDataBootstrapper
     @Override
     public void populateDatabase(SwapDatabase database)
     {
-        Parser parser = new DBFParser();
-        ContentHandler handler = new BodyContentHandler(new ToXMLContentHandler());
+        PrintWriter writer;
 
         try
         {
-            log.debug(String.format("Parsing DBF for '%s' to XHTML text . . .", database.getTableName()));
+            writer = new PrintWriter(new File("parsed.out"));
+        } catch (FileNotFoundException ex)
+        {
+            throw new RuntimeException("Failed to open print writer to output file", ex);
+        }
 
-            InputStream stream = new FileInputStream(String.format("%s/%s.DBF", rootDir, database.getTableName()));
+        Parser parser = new DBFParser();
+        ContentHandler handler = new BodyContentHandler(writer);
+
+        List<String> headers;
+
+        try
+        {
+            log.debug(String.format("Parsing DBF for '%s' to temporary text file . . .", database.getTableName()));
+
+            String fileName = String.format("%s/%s.DBF", rootDir, database.getTableName());
+
+            headers = DBFParsingUtil.getHeaders(new File(fileName));
+
+            InputStream stream = new FileInputStream(fileName);
             parser.parse(stream, handler, new Metadata(), new ParseContext());
+
+            writer.flush();
+            writer.close();
 
             stream.close();
         } catch (Exception ex)
@@ -70,53 +80,51 @@ public class DBFDataBootstrapperImpl extends AbstractDataBootstrapper
 
         try
         {
-            log.debug("Processing XHTML document table values . . .");
+            log.debug("Processing parsed document table values . . .");
 
-            // Parse XHTML from content handler
-            Document document = DocumentBuilderFactory.newInstance()
-                    .newDocumentBuilder()
-                    .parse(new InputSource(new StringReader(handler.toString())));
+            BufferedReader input = new BufferedReader(new FileReader("parsed.out"));
 
-            // Grab list of table header values
-            NodeList thNodes = document.getElementsByTagName("thead")
-                    .item(0)
-                    .getChildNodes();
-            ArrayList<String> headers = new ArrayList<>();
+            String firstLine = input.readLine();
+            String[] firstLineValues = firstLine.substring(1).split("\t");
 
-            // Populate list with text contents of th elements
-            for (int i = 0; i < thNodes.getLength(); i++)
-            {
-                Node node = thNodes.item(i);
-
-                if (node.getNodeName().equals("th"))
-                    headers.add(node.getTextContent());
-            }
+//            for (String h : headers)
+//                System.out.print(h + "; ");
+//            System.out.println();
 
             // Grab list of table row nodes
-            NodeList trNodes = document.getElementsByTagName("tbody")
-                    .item(0)
-                    .getChildNodes();
             ArrayList<JSONObject> rows = new ArrayList<>();
 
+            String line;
+
             // Iterate through table body rows
-            for (int row = 0; row < trNodes.getLength(); row++)
-                if (trNodes.item(row).getNodeName().equals("tr"))
-                {
-                    // Keep independent count of cell vs. node number
-                    int cell = 0;
+            while ((line = input.readLine()) != null)
+            {
+                if (line.length() == 0)
+                    continue;
 
-                    NodeList rowCells = trNodes.item(row)
-                            .getChildNodes();
-                    JSONObject rowValues = new JSONObject();
+                JSONObject rowValues = new JSONObject();
+                String[] split = line.substring(1).split("\t");
 
-                    for (int i = 0; i < rowCells.getLength(); i++)
+                for (int i = 0; i < split.length; i++)
+                    try
                     {
-                        if (rowCells.item(i).getNodeName().equals("td"))
-                            rowValues.put(headers.get(cell++), rowCells.item(i).getTextContent());
+                        rowValues.put(firstLineValues[i], split[i]);
+                    } catch (IndexOutOfBoundsException ex)
+                    {
+                        log.error("Failed to process line values (skipping)", ex);
                     }
 
-                    rows.add(rowValues);
-                }
+                rows.add(rowValues);
+            }
+
+            // Dirty workaround for Tika issue (Tika writes the first line inline
+            // with the headers); see also DBFParsingUtil
+            JSONObject firstEntry = new JSONObject();
+            for (int i = 0; i < headers.size() && headers.size() + i < firstLineValues.length; i++)
+                    firstEntry.put(headers.get(i), firstLineValues[headers.size() + i]);
+            rows.add(0, firstEntry);
+
+            input.close();
 
             database.swap(Database.createImmutable(database.getTableName(), rows));
         } catch (Exception ex)

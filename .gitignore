@@ -19,6 +19,7 @@ buildNumber.properties
 
 *.log
 *.temp
+*.out
 
 **/.gradle/
 **/build/
