@@ -20,7 +20,9 @@ dependencies {
             'org.apache.tomcat.embed:tomcat-embed-jasper',
             'org.json:json:20200518',
 
-            'org.apache.tika:tika-parsers:1.21'
+            'org.apache.tika:tika-parsers:1.21',
+
+            'org.webjars:jquery:3.5.1'
 
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
