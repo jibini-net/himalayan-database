@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class CSVDataBootstrapper extends AbstractDataBootstrapper
+public class CSVDataBootstrapperImpl extends AbstractDataBootstrapper
 {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final String rootDir;
 
-    public CSVDataBootstrapper(String rootDir, Runnable[] preTasks)
+    public CSVDataBootstrapperImpl(String rootDir, Runnable[] preTasks)
     {
         super(preTasks);
 

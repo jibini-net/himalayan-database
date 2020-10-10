@@ -1,6 +1,6 @@
 package edu.uwlax.himal.data;
 
-import edu.uwlax.himal.data.impl.CSVDataBootstrapper;
+import edu.uwlax.himal.data.impl.CSVDataBootstrapperImpl;
 import edu.uwlax.himal.data.impl.DecoratedDatabaseImpl;
 import edu.uwlax.himal.data.impl.DBFDataBootstrapperImpl;
 import edu.uwlax.himal.data.impl.JDBCDataBootstrapperImpl;
@@ -93,6 +93,6 @@ public interface DataBootstrapper
      */
     static DataBootstrapper createFromCSVDirectory(String rootDir, Runnable ... preTasks)
     {
-        return new CSVDataBootstrapper(rootDir, preTasks);
+        return new CSVDataBootstrapperImpl(rootDir, preTasks);
     }
 }

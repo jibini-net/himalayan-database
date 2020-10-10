@@ -58,7 +58,7 @@ public class DBFDataBootstrapperImpl extends AbstractDataBootstrapper
         {
             log.debug(String.format("Parsing DBF for '%s' to XHTML text . . .", database.getTableName()));
 
-            InputStream stream = new FileInputStream(String.format("%s/%s.dbf", rootDir, database.getTableName()));
+            InputStream stream = new FileInputStream(String.format("%s/%s.DBF", rootDir, database.getTableName()));
             parser.parse(stream, handler, new Metadata(), new ParseContext());
 
             stream.close();
