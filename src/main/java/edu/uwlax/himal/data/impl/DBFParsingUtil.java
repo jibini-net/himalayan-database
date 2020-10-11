@@ -10,7 +10,7 @@ public class DBFParsingUtil
     {
         try
         {
-            List<String> names = new ArrayList<String>();
+            List<String> names = new ArrayList<>();
 
             FileInputStream stream = new FileInputStream(file);
             // Don't care about most of file header
