@@ -8,6 +8,7 @@
         <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
 
         <link rel="stylesheet" href="stylesheets/elevation_map.css">
+        <link rel="shortcut icon" href="images/favicon.ico">
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
             integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
             crossorigin=""></script>
@@ -18,7 +19,7 @@
 
         <script>
             var peakIcon = L.icon({
-                iconUrl: 'images/temp-marker.png'
+                iconUrl: 'images/peak-marker.png'
             });
         </script>
         <title>Himalayan Peaks by Elevation</title>
