@@ -57,8 +57,8 @@ public class PeakAnalysis
             String peakID = object.getString("PEAKID");
 
             result.put("peak-id", peakID);
-            result.put("peak-name", peakID);
 
+            result.put("peak-name", object.get("PKNAME"));
             result.put("peak-climbed", object.get("PSTATUS").equals("2"));
 
             try
@@ -78,6 +78,6 @@ public class PeakAnalysis
             array.put(result);
         }
 
-        return array.toString(4);
+        return array.toString();
     }
 }
