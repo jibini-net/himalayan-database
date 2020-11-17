@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
+
 @Controller
 public class PeakAnalysis
 {
@@ -23,12 +25,39 @@ public class PeakAnalysis
     {
         JSONArray array = new JSONArray();
 
+        HashMap<String, Integer> accumExped = new HashMap<>();
+        HashMap<String, Integer> accumSuccess = new HashMap<>();
+
+        for (JSONObject expedition : himalayan.expeditions.getContents())
+        {
+            if (expedition.has("PEAKID"))
+            {
+                String peakID = expedition.getString("PEAKID");
+                accumExped.put(peakID, accumExped.getOrDefault(peakID, 0) + 1);
+
+                if (expedition.has("TERMREASON"))
+                    switch (expedition.getString("TERMREASON"))
+                    {
+                        // Success (main peak)
+                        case "1":
+                        // Success (subpeak, foresummit)
+                        case "2":
+                        // Success (claimed)
+                        case "3":
+                            accumSuccess.put(peakID, accumSuccess.getOrDefault(peakID, 0) + 1);
+                            break;
+                    }
+            }
+        }
+
         for (JSONObject object : himalayan.peaks.getContents())
         {
             JSONObject result = new JSONObject();
 
-            result.put("peak-id", object.get("PEAKID"));
-            result.put("peak-name", object.get("PKNAME"));
+            String peakID = object.getString("PEAKID");
+
+            result.put("peak-id", peakID);
+            result.put("peak-name", peakID);
 
             result.put("peak-climbed", object.get("PSTATUS").equals("2"));
 
@@ -40,33 +69,11 @@ public class PeakAnalysis
                 result.put("peak-height", 0);
             }
 
-            JSONArray relatedExpeditions = resources.getExpeditions(
-                    String.format("PEAKID equals %s", object.get("PEAKID"))
-            );
+            int numExped = accumExped.getOrDefault(peakID, 0);
+            int numSuccess = accumSuccess.getOrDefault(peakID, 0);
 
-            int success = 0;
-
-            for (Object expedition : relatedExpeditions)
-            {
-                JSONObject exp = (JSONObject)expedition;
-
-                if (exp.has("TERMREASON"))
-                    switch (exp.getString("TERMREASON"))
-                    {
-                        // Success (main peak)
-                        case "1":
-                        // Success (subpeak, foresummit)
-                        case "2":
-                        // Success (claimed)
-                        case "3":
-                            success++;
-
-                            break;
-                    }
-            }
-
-            result.put("num-expeditions", relatedExpeditions.length());
-            result.put("num-successful", success);
+            result.put("num-expeditions", numExped);
+            result.put("num-successful", numSuccess);
 
             array.put(result);
         }
