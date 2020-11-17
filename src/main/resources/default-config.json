@@ -8,5 +8,7 @@
   "table-peaks": "peaks",
 
   "package-root-dir": "Himalayan Database",
-  "table-root-dir": "Himalayan Database/HIMDATA"
+  "table-root-dir": "Himalayan Database/HIMDATA",
+
+  "dev-mode": false
 }

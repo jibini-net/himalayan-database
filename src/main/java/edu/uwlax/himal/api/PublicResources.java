@@ -30,7 +30,7 @@ public class PublicResources
             String arg = scan.next();
 
             if (!values.has(field))
-                throw new IllegalStateException(String.format("Invalid filter field name '%s'", field));
+                return false;
             String fieldValue = values.getString(field);
 
             switch (operator)
@@ -53,11 +53,7 @@ public class PublicResources
         return true;
     }
 
-    @GetMapping("/member")
-    @ResponseBody
-    public String mappedGetMembers(
-            @RequestParam(defaultValue = "") String filter
-    )
+    public JSONArray getMembers(String filter)
     {
         JSONArray array = new JSONArray();
 
@@ -67,14 +63,19 @@ public class PublicResources
                 array.put(object);
         }
 
-        return array.toString();
+        return array;
     }
 
-    @GetMapping("/peak")
+    @GetMapping("/member")
     @ResponseBody
-    public String mappedGetPeaks(
+    public String mappedGetMembers(
             @RequestParam(defaultValue = "") String filter
     )
+    {
+        return getMembers(filter).toString();
+    }
+
+    public JSONArray getPeaks(String filter)
     {
         JSONArray array = new JSONArray();
 
@@ -97,14 +98,19 @@ public class PublicResources
                 array.put(object);
         }
 
-        return array.toString();
+        return array;
     }
 
-    @GetMapping("/expedition")
+    @GetMapping("/peak")
     @ResponseBody
-    public String mappedGetExpeditions(
+    public String mappedGetPeaks(
             @RequestParam(defaultValue = "") String filter
     )
+    {
+        return getPeaks(filter).toString();
+    }
+
+    public JSONArray getExpeditions(String filter)
     {
         JSONArray array = new JSONArray();
 
@@ -114,6 +120,15 @@ public class PublicResources
                 array.put(object);
         }
 
-        return array.toString();
+        return array;
+    }
+
+    @GetMapping("/expedition")
+    @ResponseBody
+    public String mappedGetExpeditions(
+            @RequestParam(defaultValue = "") String filter
+    )
+    {
+        return getExpeditions(filter).toString();
     }
 }

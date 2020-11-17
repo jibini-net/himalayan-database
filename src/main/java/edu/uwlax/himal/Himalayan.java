@@ -177,6 +177,10 @@ public class Himalayan implements CommandLineRunner, WebMvcConfigurer
     //TODO MOVE TO OWN CLASS/CREATE ABSTRACT VERSION
     private void downloadPrerequisites()
     {
+        // Development mode does not download the packages every time (saves time)
+        if (config.getBoolean("dev-mode"))
+            return;
+
         try
         {
             log.info("Downloading latest database packages . . .");
