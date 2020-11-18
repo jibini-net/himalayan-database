@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.HashMap;
-import java.util.List;
 
 @Controller
 public class PeakAnalysis
@@ -20,6 +19,28 @@ public class PeakAnalysis
 
     @Autowired
     private PublicResources resources;
+
+    private float parseFloat(String string)
+    {
+        try
+        {
+            return Float.parseFloat(string);
+        } catch (NumberFormatException ex)
+        {
+            return 0.0f;
+        }
+    }
+
+    private int parseInt(String string)
+    {
+        try
+        {
+            return Integer.parseInt(string);
+        } catch (NumberFormatException ex)
+        {
+            return 0;
+        }
+    }
 
     @GetMapping("/peak-analysis")
     @ResponseBody
@@ -114,7 +135,7 @@ public class PeakAnalysis
                 r.put("peak-id", "Not listed");
 
             if (e.has("YEAR"))
-                r.put("year", Integer.parseInt(e.getString("YEAR")));
+                r.put("year", parseInt(e.getString("YEAR")));
             else
                 r.put("year", 0);
 
@@ -169,12 +190,12 @@ public class PeakAnalysis
                 r.put("summit-time", "Not listed");
 
             if (e.has("SMTDAYS"))
-                r.put("summit-days", Integer.parseInt(e.getString("SMTDAYS")));
+                r.put("summit-days", parseInt(e.getString("SMTDAYS")));
             else
                 r.put("summit-days", 0);
 
             if (e.has("TOTDAYS"))
-                r.put("total-days", Integer.parseInt(e.getString("TOTDAYS")));
+                r.put("total-days", parseInt(e.getString("TOTDAYS")));
             else
                 r.put("total-days", 0);
 
@@ -189,7 +210,7 @@ public class PeakAnalysis
                 r.put("termination-note", "Not listed");
 
             if (e.has("HIGHPOINT"))
-                r.put("high-point", Float.parseFloat(e.getString("HIGHPOINT")));
+                r.put("high-point", parseFloat(e.getString("HIGHPOINT")));
             else
                 r.put("high-point", 0.0f);
 
@@ -214,27 +235,27 @@ public class PeakAnalysis
                 r.put("trekking-agency", "Not listed");
 
             if (e.has("ROPE"))
-                r.put("rope-length", Float.parseFloat(e.getString("ROPE")));
+                r.put("rope-length", parseFloat(e.getString("ROPE")));
             else
                 r.put("rope-length", 0.0f);
 
             if (e.has("TOTMEMBERS"))
-                r.put("total-members", Integer.parseInt(e.getString("TOTMEMBERS")));
+                r.put("total-members", parseInt(e.getString("TOTMEMBERS")));
             else
                 r.put("total-members", 0);
 
             if (e.has("MDEATHS"))
-                r.put("member-deaths", Integer.parseInt(e.getString("MDEATHS")));
+                r.put("member-deaths", parseInt(e.getString("MDEATHS")));
             else
                 r.put("member-deaths", 0);
 
             if (e.has("TOTHIRED"))
-                r.put("total-hired", Integer.parseInt(e.getString("TOTHIRED")));
+                r.put("total-hired",parseInt(e.getString("TOTHIRED")));
             else
                 r.put("total-hired", 0);
 
             if (e.has("HDEATHS"))
-                r.put("hired-deaths", Integer.parseInt(e.getString("HDEATHS")));
+                r.put("hired-deaths", parseInt(e.getString("HDEATHS")));
             else
                 r.put("hired-deaths", 0);
 
