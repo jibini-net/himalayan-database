@@ -7,11 +7,14 @@
         <mvc:resources mapping="/webjars/**" location="/webjars/" />
         <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
 
+        <link rel="stylesheet" href="stylesheets/site_header.css">
         <link rel="stylesheet" href="stylesheets/elevation_map.css">
-        <link rel="shortcut icon" href="images/favicon.ico">
+	    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
             integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
             crossorigin=""></script>
+
         <script src="scripts/peak.js"></script>
         <script src="scripts/data.js"></script>
         <script src="scripts/setup.js"></script>
@@ -22,45 +25,42 @@
                 iconUrl: 'images/peak-marker.png'
             });
         </script>
-        <title>Himalayan Peaks by Elevation</title>
+        <title>Visualization of the Himalayan Database</title>
     </head>
     <body>
-        <div id="mapContent">
-            <div id="controlBar">
-                <div class="mapTitle">Himalayan Peaks by Elevation</div>
-                <div class="options">
-                    <div class="optionGroup">
-                        <div class="optionColumn">
-                            <div class="optionText">Minimum elevation (m):</div>
-                            <div class="optionText">Maximum elevation (m):</div>
-                        </div>
-                        <div class="optionColumn">
-                            <input id="minimumElevation" class="inputBox" />
-                            <input id="maximumElevation" class="inputBox" />
-                        </div>
+        <div id="controlBar">
+            <img class="siteLogo" src="images/logo.png" />
+            <div class="headerText">
+                <div class="webTitle">Visualization of the Himalayan Database</div>
+                <div class="headerLinks">
+                    <div class="headerLinkContainer selected">
+                        <div class="headerLink">Map</div>
                     </div>
-                    <div class="optionGroup">
-                        <div class="optionColumn">
-                            <div class="optionText">Include climbed peaks:</div>
-                            <div class="optionText">Include unclimbed peaks:</div>
-                        </div>
-                        <div class="optionColumn">
-                            <input id="blnClimbedPeaks" class="blnControl" type="checkbox" checked/>
-                            <input id="blnUnclimbedPeaks" class="blnControl" type="checkbox" checked/>
-                        </div>
-                    </div>
-                    <button onclick="onFilter()" id="btnFilter" type="button">Filter</button>
+                    <a class="headerLinkContainer" href="peak-analysis.jsp">
+                        <div class="headerLink">Explore Peaks</div>
+                    </a>
+                    <a class="headerLinkContainer" href="about.jsp">
+                        <div class="headerLink">About</div>
+                    </a>
                 </div>
             </div>
-            <div id="mapid"></div>
         </div>
+        <div id="mapid"></div>
         <script>
             var map = initializeMap();
-            var markers = L.layerGroup().addTo(map);
+            var markers = L.layerGroup();
             resetMapElements();
+            markers.addTo(map);
 
-            var onFilter = function()
-            {
+            var filterControl = L.control({ position: 'topright' });
+            filterControl.onAdd = function(map) {
+                this._div = L.DomUtil.create('div', 'filterControl');
+                this._div.innerHTML = '<div class="options"><div class="filterSettings">Display Settings</div><div class="optionGroup"><div class="option"><div class="optionText">Minimum elevation (m):</div><input id="minimumElevation" class="inputBox" /></div><div class="option"><div class="optionText">Maximum elevation (m):</div><input id="maximumElevation" class="inputBox" /></div></div><div class="optionGroup"><div class="option"><div class="optionText">Include climbed peaks:</div><input id="blnClimbedPeaks" type="checkbox" checked/></div><div class="option"><div class="optionText">Include unclimbed peaks:</div><input id="blnUnclimbedPeaks" type="checkbox" checked/></div></div><button onclick="onFilter()" id="btnFilter" type="button">Filter</button></div>';
+                return this._div;
+            }
+            filterControl.addTo(map);
+
+            var onFilter = function() {
                 markers.remove();
                 markers = L.layerGroup().addTo(map);
                 filterAll();
