@@ -1,0 +1,21 @@
+/* Begin Temporary Page Styles */
+
+.temp_content {
+    display: flex;
+    height: 100%;
+    font-size: 90px;
+    align-items: center;
+    justify-content: center;
+}
+
+.temp_module {
+    display: flex;
+    height: 120px;
+    width: 600px;
+    align-items: center;
+    justify-content: center;
+    background-color: #333333;
+    border-radius: 15px;
+}
+
+/* End Temporary Page Styles */

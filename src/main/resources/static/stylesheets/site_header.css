@@ -1,0 +1,63 @@
+body {
+    background-image: url('everest.png');
+    color: #FFFFFF;
+    background-color: #000000;
+}
+
+/* Begin Website Header Styles */
+
+#controlBar {
+    display: flex;
+    height: 10%;
+    position: relative;
+}
+
+.siteLogo {
+    height: 100%;
+}
+
+.webTitle {
+    font-size: 40px;
+    height: 50%;
+    font-family: 'Microsoft Himalaya';
+}
+
+.headerLinks {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 50%;
+    width: 250px;
+}
+
+.headerLinkContainer {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+a.headerLinkContainer {
+    color: white;
+    text-decoration: none;
+}
+
+.headerLinkContainer:hover {
+    transition-duration: 0.5s;
+    background-color: midnightblue;
+}
+
+.selected {
+    cursor: pointer;
+    background-color: midnightblue;
+}
+
+.headerText {
+    margin-left: 4px;
+}
+
+.headerLink {
+    font-size: 18px;
+}
+/* End Website Header Styles */
