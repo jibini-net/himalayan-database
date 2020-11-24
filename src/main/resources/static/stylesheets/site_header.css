@@ -1,5 +1,6 @@
 body {
     background-image: url('everest.png');
+    background-size: cover;
     color: #FFFFFF;
     background-color: #000000;
 }
