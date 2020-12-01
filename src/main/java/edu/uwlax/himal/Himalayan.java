@@ -266,12 +266,6 @@ public class Himalayan implements CommandLineRunner, WebMvcConfigurer
         log.info("Initialization complete!\n");
     }
 
-    @GetMapping("/")
-    public String indexPage()
-    {
-        return "index";
-    }
-
     /**
      * @return Primary configuration file loaded from the application working directory
      */
