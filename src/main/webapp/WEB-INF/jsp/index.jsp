@@ -36,10 +36,10 @@
                     <div class="headerLinkContainer selected">
                         <div class="headerLink">Map</div>
                     </div>
-                    <a class="headerLinkContainer" href="peak-analysis.jsp">
+                    <a class="headerLinkContainer" href="peak-analysis.html">
                         <div class="headerLink">Explore Peaks</div>
                     </a>
-                    <a class="headerLinkContainer" href="about.jsp">
+                    <a class="headerLinkContainer" href="about.html">
                         <div class="headerLink">About</div>
                     </a>
                 </div>
