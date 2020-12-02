@@ -3,6 +3,8 @@ body {
     background-size: cover;
     color: #FFFFFF;
     background-color: #000000;
+    min-height: 600px;
+    min-width: 1350px;
 }
 
 /* Begin Website Header Styles */
