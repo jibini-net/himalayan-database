@@ -15,7 +15,7 @@ $(document).ready(function() {
             peak.numSuccessful = parsed[i]['num-successful'];
 
             peaks.push(peak);
-		}
+	}
     })
     populatePeakList(peaks);
 });
