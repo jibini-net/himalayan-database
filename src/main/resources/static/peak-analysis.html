@@ -1,31 +1,52 @@
 <html>
-<head>
-    <link rel="stylesheet" href="stylesheets/site_header.css">
-    <link rel="stylesheet" href="stylesheets/peak_analysis_page.css">
-    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-</head>
-<body>
-    <div id="controlBar">
-        <img class="siteLogo" src="images/logo.png" />
-        <div class="headerText">
-            <div class="webTitle">Visualization of the Himalayan Database</div>
-            <div class="headerLinks">
-                <a class="headerLinkContainer" href="/index.html">
-                    <div class="headerLink">Map</div>
-                </a>
-                <div class="headerLinkContainer selected">
-                    <div class="headerLink">Explore Peaks</div>
+    <head>
+        <link rel="stylesheet" href="stylesheets/site_header.css">
+        <link rel="stylesheet" href="stylesheets/peak_analysis_page.css">
+        <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    
+        <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+        <script src="scripts/peak.js"></script>
+        <script src="scripts/analysisData.js"></script>
+        <script src="scripts/analysisDisplay.js"></script>
+        <script src="scripts/peakAnalysisFilter.js"></script>
+    </head>
+    <body>
+        <div id="controlBar">
+            <img class="siteLogo" src="images/logo.png" />
+            <div class="headerText">
+                <div class="webTitle">Visualization of the Himalayan Database</div>
+                <div class="headerLinks">
+                    <a class="headerLinkContainer" href="/index.html">
+                        <div class="headerLink">Map</div>
+                    </a>
+                    <div class="headerLinkContainer selected">
+                        <div class="headerLink">Explore Peaks</div>
+                    </div>
+                    <a class="headerLinkContainer" href="about.html">
+                        <div class="headerLink">About</div>
+                    </a>
                 </div>
-                <a class="headerLinkContainer" href="about.html">
-                    <div class="headerLink">About</div>
-                </a>
             </div>
         </div>
-    </div>
-    <div class="temp_content">
-        <div class="temp_module">
-            <div>Coming Soon</div>
+        <div class="analysisContent">
+            <div class="module peakDisplay">
+                <div class="filterBar">
+                    <input id="searchFilter" placeholder="Search Peak Name..." />
+                    <select id="contentFilter">
+                        <option value="name">By Name</option>
+                        <option value="height">By Height</option>
+                        <option value="success">By Success Rate</option>
+                    </select>
+                    <button onclick="onAnalysisFilter()">Search</button>
+                </div>
+                <div id="peakList">
+                </div>
+            </div>
+            <div class="module expedDisplay">
+                <div class="temp_module">
+                    <div>Coming Soon</div>
+                </div>
+            </div>
         </div>
-    </div>
-</body>
+    </body>
 </html>
