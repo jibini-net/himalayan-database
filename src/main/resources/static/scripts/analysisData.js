@@ -16,8 +16,8 @@ $(document).ready(function() {
 
             peaks.push(peak);
 	}
+	populatePeakList(peaks);
     });
-    populatePeakList(peaks);
 });
 
 var retrievePeakData = function() {
