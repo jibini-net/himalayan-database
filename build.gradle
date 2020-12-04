@@ -8,6 +8,10 @@ plugins {
 group 'edu.uwlax'
 version '1.0-SNAPSHOT'
 
+bootRun {
+    jvmArgs = ['-Xmx3600M']
+}
+
 repositories {
     mavenCentral()
 }
