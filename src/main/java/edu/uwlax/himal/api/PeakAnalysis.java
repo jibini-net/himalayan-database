@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
+import java.util.*;
 
 @Controller
 public class PeakAnalysis
@@ -48,6 +48,8 @@ public class PeakAnalysis
     {
         JSONArray array = new JSONArray();
 
+        HashMap<String, HashMap<Integer, Integer>> expedPerYear = new HashMap<>();
+
         HashMap<String, Integer> accumExped = new HashMap<>();
         HashMap<String, Integer> accumSuccess = new HashMap<>();
 
@@ -57,6 +59,18 @@ public class PeakAnalysis
             {
                 String peakID = expedition.getString("PEAKID");
                 accumExped.put(peakID, accumExped.getOrDefault(peakID, 0) + 1);
+
+                HashMap<Integer, Integer> perYear = expedPerYear.computeIfAbsent(peakID, (String key) -> new HashMap<>());
+
+                if (expedition.has("YEAR"))
+                {
+                    try
+                    {
+                        int year = Integer.parseInt(expedition.getString("YEAR"));
+                        perYear.put(year, perYear.getOrDefault(year, 0) + 1);
+                    } catch (NumberFormatException ex)
+                    { }
+                }
 
                 if (expedition.has("TERMREASON"))
                     switch (expedition.getString("TERMREASON"))
@@ -97,6 +111,25 @@ public class PeakAnalysis
 
             result.put("num-expeditions", numExped);
             result.put("num-successful", numSuccess);
+
+            HashMap<Integer, Integer> perYear = expedPerYear.computeIfAbsent(peakID, (String key) -> new HashMap<>());
+
+            JSONArray years = new JSONArray();
+            List<Integer> keysAsList = new ArrayList<>(perYear.keySet());
+
+            keysAsList.sort(Comparator.comparingInt(a -> a));
+
+            for (int year : keysAsList)
+            {
+                JSONObject y = new JSONObject();
+
+                y.put("year", year);
+                y.put("expedition-count", perYear.get(year));
+
+                years.put(y);
+            }
+
+            result.put("expeditions-per-year", years);
 
             array.put(result);
         }
