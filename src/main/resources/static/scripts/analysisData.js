@@ -12,7 +12,12 @@ $(document).ready(function() {
             peak.hasBeenClimbed = parsed[i]['peak-climbed'];
             peak.numExped = parsed[i]['num-expeditions'];
             peak.numSuccessful = parsed[i]['num-successful'];
-            peak.attempts = queryAttempts(peak.id);
+
+            attemptsQuery = [];
+            for(j = 0; j < parsed[i]['expeditions-per-year'].length; j++) {
+                attemptsQuery[j] = [parsed[i]['expeditions-per-year'][j]['year'], parsed[i]['expeditions-per-year'][j]['expedition-count']];
+			}
+            peak.attempts = attemptsQuery;
 
             peaks.push(peak);
         }
@@ -57,30 +62,6 @@ var queryExped = function(peakId) {
             expedData.push(expedition);
 		}
         populateExpedList(expedData);
-    })
-}
-
-var queryAttempts = function(peakId) {
-    $.get("/peak-analysis/" + peakId, function(data) {
-        var parsed = JSON.parse(data);
-
-        // attempts as an array of [year, expeditionCount]
-        attempts = [];
-        attempts.push([parsed[0]['year'], 1]);
-        for(i = 1; i < parsed.length; i++) {
-            var year = parsed[i]['year'];
-            var newYear = true;
-            for(j = 0; j < parsed.length; j++) {
-                if(j[0] == year) {
-                    j[1]++;
-                    newYear = false;
-				}
-            }
-            if(newYear == true) {
-                attempts.push([year, 1]);
-			}
-		}
-        return attempts;
     })
 }
 
