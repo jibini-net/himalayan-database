@@ -103,7 +103,7 @@ var expedRedraw = function(expedition, isInitial) {
 		days = "" + expedition.expeditionLength;
 	}
 
-	var innerHTML = "<div class=\"expedTitle\">ID: " + expedition.id + "</div><div class=\"expedInfo\">" + expedition.summitDate + " - " + days + " days, " + expedition.members + " members</div><div class=\"expedContent\"><div class=\"" + fatalitiesClass + "\">" + expedition.fatalities + plural + "</div><div class=\"routesContainer\"><div class=\"routesLabel\">" + expedition.routeSuccesses + " / " + expedition.routeCount + " routes succuessful</div><div id=\"" + toggleId + "\" class=\"routesToggle\">Show routes</div></div></div>";
+	var innerHTML = "<div class=\"expedTitle\">ID: " + expedition.id + "</div><div class=\"expedInfo\">" + expedition.summitDate + " - " + days + " days, " + expedition.members + " members</div><div class=\"expedContent\"><div class=\"" + fatalitiesClass + "\">" + expedition.fatalities + plural + "</div><div class=\"routesContainer\"><div class=\"routesLabel\">" + expedition.routeSuccesses + " / " + expedition.routeCount + " routes successful</div><div id=\"" + toggleId + "\" class=\"routesToggle\">Show routes</div></div></div>";
 
 	if(isInitial) {
 		$(innerHTML).appendTo("#" + expedition.id).hide().fadeIn('slow');
