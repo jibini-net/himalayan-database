@@ -6,5 +6,5 @@ class Peak {
     hasBeenClimbed = false;
     numExped = 0;
     numSuccessful = 0;
-    attempts = [];  // array of [year, expeditionNumber]
+    attempts = [];  // array of [year, expeditionCount]
 }

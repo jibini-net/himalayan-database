@@ -26,7 +26,15 @@ var sortHeight = function(peaks) {
 
 var sortSuccessRate = function(peaks) {
 	peaks.sort((a, b) => {
-		return (a.numExped / a.numSuccessful) >= (b.numExped / b.numSuccessful) ? 1 : -1;
+		if(a.numExped == 0) { return 1; }
+		if(b.numExped == 0) { return -1; }
+
+		if((a.numSuccessful / a.numExped) > (b.numSuccessful / b.numExped)) { return -1; }
+		else if((a.numSuccessful / a.numExped) < (b.numSuccessful / b.numExped)) { return 1; }
+		else {
+			if(a.numExped > b.numExped) { return -1; }
+			else { return 1; }
+		}
 	});
 	return peaks;
 }
