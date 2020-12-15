@@ -1,21 +1,29 @@
-/* Begin Temporary Page Styles */
-
-.temp_content {
+.about_content {
     display: flex;
-    height: 100%;
-    font-size: 90px;
+    height: 90%;
+    font-size: 20px;
     align-items: center;
-    justify-content: center;
 }
 
-.temp_module {
-    display: flex;
-    height: 120px;
-    width: 600px;
-    align-items: center;
-    justify-content: center;
+.about_module {
+    height: 95%;
+    width: 40%;
     background-color: #333333;
     border-radius: 15px;
 }
 
-/* End Temporary Page Styles */
+.about_text {
+    margin: 14px;
+}
+
+.title_text {
+    font-size: 32px;
+}
+
+.content_text {
+    margin-top: 10px;
+}
+
+.refLink {
+    color: aliceblue;
+}
