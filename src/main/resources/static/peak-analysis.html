@@ -5,12 +5,14 @@
         <link rel="icon" type="image/x-icon" href="images/favicon.ico">
     
         <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+        <script src="scripts/Chart.min.js"></script>
         <script src="scripts/peak.js"></script>
         <script src="scripts/analysisData.js"></script>
         <script src="scripts/analysisDisplay.js"></script>
         <script src="scripts/peakAnalysisFilter.js"></script>
         <script src="scripts/exped.js"></script>
         <script src="scripts/route.js"></script>
+        <script src="scripts/peakCharts.js"></script>
     </head>
     <body>
         <div id="controlBar">
@@ -50,14 +52,10 @@
                 </div>
                 <div class="graphContent">
                     <div id="pie" class="graph">
-                        <div class="tempContent">
-                            <div class="tempText">Coming Soon</div>
-                        </div>
+                        <div class="graphPlaceholderText">Select a peak to view</div>
                     </div>
-                    <div id="bar" class="graph">
-                        <div class="tempContent">
-                            <div class="tempText">Coming Soon</div>
-                        </div>
+                    <div id="scatter" class="graph">
+                        <div class="graphPlaceholderText">Select a peak to view</div>
                     </div>
                 </div>
             </div>
