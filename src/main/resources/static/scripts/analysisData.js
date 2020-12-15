@@ -25,11 +25,15 @@ $(document).ready(function() {
     });
 });
 
-var queryExped = function(peakId) {
+var queryExped = function(peakId, expedSuccess, expedFailure, attempts) {
+    selectPeak(peakId);
     $('#expedList').empty();
     $('#expedList').append("<div class=\"placeholderText\">Loading...</div>");
-    selectPeak(peakId);
-
+    $('#pie').empty();
+    $('#pie').append("<div class=\"graphPlaceholderText\">Loading...</div>");
+    $('#scatter').empty();
+    $('#scatter').append("<div class=\"graphPlaceholderText\">Loading...</div>");
+    
     $.get("/peak-analysis/" + peakId, function(data) {
         var expedData = [];
         var parsed = JSON.parse(data);
@@ -62,6 +66,15 @@ var queryExped = function(peakId) {
             expedData.push(expedition);
 		}
         populateExpedList(expedData);
+
+        $('#pie').empty();
+        $('#scatter').empty();
+        $('#pie').append('<canvas id="pieChart"></canvas>');
+        $('#scatter').append('<canvas id="scatterChart"></canvas>');
+        var pieEl = $('#pieChart');
+        var scatterEl = $('#scatterChart');
+        createPie(pieEl, expedSuccess, expedFailure);
+        createScatter(scatterEl, attempts);
     })
 }
 

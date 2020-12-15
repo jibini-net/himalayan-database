@@ -19,12 +19,13 @@ var populatePeakList = function(peaks) {
 		}
 
 		var id = peaks[i].id;
+		var attempts = peaks[i].attempts;
 		var innerHTML = "<div id=\"" + id + "\" class=\"" + moduleClass + "\"><div class=\"peakColumn\"><div class=\"peakLabel\">" + peaks[i].name + " - " + peaks[i].height + " m</div><div class=\"successLabel\">" + peaks[i].numSuccessful + " / " + peaks[i].numExped + " Expeditions Successful</div></div><div class=\"peakColumn\"><div class=\"climbedLabel\">Status: " + climbStatus + "</div></div></div>";
 		$("#peakList").append(innerHTML);
 
 		// bind click event
 		var element = document.getElementById(id);
-		element.addEventListener("click", queryExped.bind(null, id));
+		element.addEventListener("click", queryExped.bind(null, id, peaks[i].numSuccessful, peaks[i].numExped - peaks[i].numSuccessful, attempts));
 	}
 }
 
